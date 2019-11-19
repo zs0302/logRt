@@ -1,9 +1,4 @@
-# The R Tutorial for Logistic Regression and ROC Curve Analysis
+asdfghjk
 
-Data is [here]()
-
-html page is [here]()
-
-
-
-
+asdfg
+rtyu
