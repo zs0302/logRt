@@ -1,0 +1,95 @@
+---
+title: "Logistic regression tutorial using R"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This tutorial will help you understand logistic regression and use it analyze data.
+
+Logistic regression is a regression model where the response variable Y is binary. 
+
+You can download the data from here or here. The binary variable is obesity (yes/no), the independent variables are age, gender, and systolic blood pressure. We are going to use age, gender and systolic blood pressure (SBP) to predict obesity. After the logistic model, we are going to do ROC curve analysis to find the threshold for classification and test the accuracy of this logistic model. 
+
+Steps:
+
+###	Load the data
+
+You can download the example data for this tutorial from [Box]() or [Github](). There are 7295 observations in this data set. The depedent variable is obesity (0 =no, 1 = yes). The independent variables are gender, age and systolic blood pressure. We are going to use age , gender and systolic blood pressure to predict obese.
+
+After downloading the data to your computer, you need to find the path of the data file on your computer and import the data to R.
+
+Type the following code in the RStudio console, then a "select file" window will pop up. Use the pop-up window to navigate to the file you want to import and click "Open", the path will display in the console window.
+
+```{r eval=FALSE}
+file.choose()
+```
+
+Now you have the path of the file, you can use read.csv function to read the .csv file into R. Type the following code in the RStudio console but replace the path between quotations, with your file path. The new data set will be named "obese".
+```{r}
+obese=read.csv("C:\\Users\\zs7hm\\Desktop\\rExample.csv")
+```
+
+<br/>
+
+### training and test split
+
+We need to split the data into training set and test set. We ar going to use the training data set to train the data, then we will use the test data set to check the accuracy of the model which is trained using the training data. Usually 70% of the data set will be allocated to the training data set, adn the rest will be allocated for test data set. however, there is no strict rule for the training test set ratio.
+
+```{r eval=FALSE}
+set.seed(1)
+train=obese[sample(dim(obese)[1],dim(obese)[1]*0.7),]
+test=obese[-sample(dim(obese)[1],dim(obese)[1]*0.7),]
+```
+```{r echo=FALSE}
+set.seed(1)
+train=obese[sample(dim(obese)[1],dim(obese)[1]*0.7),]
+test=obese[-sample(dim(obese)[1],dim(obese)[1]*0.7),]
+```
+
+### Logistic regression using glm
+
+glm is abbreviation for generalized linear regression, logistic regression is just one type of the generalized linear regression. For here, the formula "Obese~." means that dependent variable is Obese, and all independent variables will be used to train the model. The "family = 'binomial'" means that we are going to use logistic regression. The summary(model) will give the result of the logistic regression.
+
+```{r eval=FALSE}
+model=glm(Obese~., family = "binomial",data=train)
+summary(model)
+```
+```{r echo=FALSE}
+model=glm(Obese~., family = "binomial",data=train)
+summary(model)
+```
+
+### Interpretation of the result
+
+###	Roc curve
+
+What is ROC curve
+
+what is AUC
+
+```{r eval=FALSE}
+library(ROCR)
+p=predict(model,newdata = test[,-1],type = "response")
+pr=prediction(p,test$Obese)
+prf=performance(pr,measure = "tpr",x.measure = "fpr")
+plot(prf)
+
+auc=performance(pr,measure = "auc")
+auc=auc@y.values[1]
+auc
+```
+```{r echo=FALSE}
+library(ROCR)
+p=predict(model,newdata = test[,-1],type = "response")
+pr=prediction(p,test$Obese)
+prf=performance(pr,measure = "tpr",x.measure = "fpr")
+plot(prf)
+
+auc=performance(pr,measure = "auc")
+auc=auc@y.values[1]
+auc
+```
+
