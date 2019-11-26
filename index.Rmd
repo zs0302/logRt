@@ -1,0 +1,148 @@
+---
+title: "Logistic regression tutorial using R"
+author: "Leary Ortho Biostats Lab"
+date: "11/25/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+<br/>
+<br/>
+<br/>
+
+This tutorial will help you understand logistic regression and the ROC curve analysis.
+
+We will firstly explain the data set which we are going to use, and how to import the data to R. Then, a brief introduction of the logistic regression will be given. When to use logistic regression and how to use it in R will be illustrated. In order to help you interpret the logistic regression result, the odds will be introduced. Finally, we will show you how to do the ROC curve analysis to measure the performance of the logistic regression.
+
+<br/>
+
+### Import the data
+
+The data set we are using here is from NHANES (National Health and Nutrition Examination Survey). We will just use the data as an example to show logistic regression, so the complex survey design will not be used here. There are 7295 observations in the data set. The dependent variable is the obesity of the subject. Subject whose BMI is over 30 will denoted with "1" and the subject with a BMI not over 30 will denoted as "0". The independent variables are age, gender and systolic blood pressure (SBP). We are going to predict subject's obesity using the age, gender and SBP variables with logistic regression model.
+
+We highly recommend you to use RStudio for the analysis in this tutorial. RStudio is an integrated development environment (IDE) for R. All the code in this tutorial are case sensitive. 
+
+You can download the data from [Box](https://missouri.box.com/s/s82enrnhdr0nfjr93ym01vns242gu7ow) or [Github](https://raw.githubusercontent.com/zhengyes/logRt/master/rExample.csv). After downloading the data to your computer, you need to find the path of the data file on your computer and import the data to R.
+
+Type the following code in the RStudio console, then a "select file" window will pop up. Use the pop-up window to navigate to the file you want to import and click "Open", the path will display in the console window.
+
+```{r eval=FALSE}
+file.choose()
+```
+
+Now you have the path of the file, you can use read.csv() function to read the .csv file into R. Type the following code in the RStudio console but replace the path between quotations, with your file path. The new data set will be named "nhanesExample".
+```{r echo=FALSE}
+nhanesExample = read.csv("C:\\Users\\zs7hm\\Desktop\\rExample.csv")
+```
+```{r eval=FALSE}
+nhanesExample = read.csv("C:\\Users\\zs7hm\\Desktop\\rExample.csv")
+```
+
+<br/>
+
+### Logistic regression
+
+<br/>
+
+#### When to use logistic regression
+Logistic regression is a statistical model uses a logistic function to model a **binary dependent variable**. 
+It is used when we want to predict the probability of a binary outcome using independent variables. The binary dependent variable is a categorical variable which has only two possible outcomes. In the data set here, the binary dependent variable is the obesity variable, which has "obesity" denoted as "1" and "not obesity" denoted as "0". 
+
+#### How to do logistic regression in R
+We need to change the gender variable and obese variable to categorical variables.
+
+```{r echo=FALSE}
+nhanesExample$gender = factor(nhanesExample$gender)
+nhanesExample$obese = factor(nhanesExample$obese)
+```
+```{r eval=FALSE}
+nhanesExample$gender = factor(nhanesExample$gender)
+nhanesExample$obese = factor(nhanesExample$obese)
+```
+
+We will use the glm (generalized linear regression) function to do the logistic regression. Logistic regression is just one type of the generalized linear regression, so in the code we use family = "binomial" to indicate that we are using logistic regression. 
+
+```{r eval=FALSE}
+model=glm(obese~ age + gender + sbp, family = "binomial",data=nhanesExample)
+```
+```{r echo=FALSE}
+model=glm(obese~ age + gender + sbp, family = "binomial",data=nhanesExample)
+```
+
+#### Interpret the result
+Let us first explain what is odds. Odds is the ratio of the probability of success and the probability of the failure. In this tutorial, the odds of obesity is probability of obesity over probability of not obesity. Why we need to know this? Because in the logistic regression model, the logarithm of the odds for the value labeled "1" (obesity here) is a linear combination of independent variables.
+
+The summary(model) can print the details for the summary results. In the result of this model, we can see that all variables are significant with p-values less than 0.05, which means that all parameters are significantly different from 0. The estimation of gender2 equals 0.419018 means that being female (gender2) will increase the log odds of obesity by 0.419018 compared with male (gender1), one year older in age will increase the log odds of obesity by 0.013873, and one unit increase in systolic blood pressure will increase the log odds of obesity by 0.017119. If we take the exponential of the estimation of the parameters, we will see that being female will increase the odds of obesity by 1.5204 compared with male, one year older will increase the odds of obesity by 1.0140 and one unit increase in systolic blood pressure will increase the odds of obesity by 1.0172.
+
+```{r eval=FALSE}
+summary(model)
+```
+```{r echo=FALSE}
+summary(model)
+```
+
+<br/>
+
+### ROC analysis
+
+<br/>
+
+ROC (Receiver Operating Characteristic) curve displays true positive rate versus false positive rate of a fitted model. It can be used for estimating the performance of a model and selecting the optimal cutoff point.
+
+Before giving you further information about the ROC curve, let us talk about the "sensitivity" and the "specificity". Sensitivity is the true positive rate and 1 - specificity is the false positive rate. The true positive rate is the proportion of true positives over the summation of true positives and false negatives, which means the ratio that the model correctly predicts the positive class. The false positive rate is the proportion of false positives over the summation of false positives and true negatives, which means the ratio that the model incorrectly predicts the positive class. In our example, the true positive is that the logistic model predict subject is obese and the subject is obese, while the false positive is that the logistic regression model predict the subject is obese but the subject is actually not obese. True negative means model predicts subject is not obese and the subject is not obese, and false negative means model predicts subject is negative but the subject is positive.
+
+Why we need this? Because in the ROC curve, the y axis is the sensitivity, which is the true positive rate, and the x axis is 1 - specificity which is the false positive rate. The ROC curve plots out the sensitivity and specificity for every possible cutoff between 0 and 1 for the logistic regression model. What we want is to push the ROC curve towards the left corner to maximize the area under the curve, which is called AUC (area under the curve). The larger the AUC is, the better the model performs.
+
+An optimal cutoff point can be determined by Youden index. The Youden index J = sensitivity + specificity -1. A value of 1 indicates that there are no false positive or false negative so that the model is perfect. A value of zero indicates that true positive rate equals to false positive rate such that the model predicts results just like random guess. The optimal cutoff point which maximize the Youden index J.
+
+We need to use pROC package to help us do the ROC analysis. If you do not have this package on your computer, you need to install it firstly, just type the following code in the RStudio console.
+
+```{r eval=FALSE}
+install.package("pROC")
+```
+
+In the ROC plot, the diagonal line means where the true positive rate equals to the false positive rate. The AUC = 0.6886, it can be used as a standard to compare between different models. The model with larger AUC performs better. The Youden index shows that the optimal threshold is 0.2532. If we set the fitted result below 0.2532 as not obese and set fitted result above 0.2532 as obese, the model will give us the best performance which has a relatively large true positive rate and relatively small false positive rate and the difference between true positive rate and false positive rate is the largest.
+
+```{r eval=FALSE}
+#using pROC library
+library(pROC)
+#make a square plot area so that the result graph looks nicer
+par(pty="s")
+#"plot=T" shows the ROC curve, "legacy.axes=T" shows "1 - specificity" on x axis instead of "specificity"
+roc(nhanesExample$obese, model$fitted.values,plot=T, legacy.axes=T)
+
+#create a variable to store ROC information
+roc.info=roc(nhanesExample$obese, model$fitted.values, legacy.axes=T)
+#create data frame store true positive rate, false positive rate and corresponding threshold
+roc.df=data.frame(
+  tpp=roc.info$sensitivities,
+  fpp=(1 - roc.info$specificities),
+  thresholds=roc.info$thresholds
+)
+#show the optimal threshold using Youden index which maximize (sensitivity + specificity -1)
+roc.df[which.max(roc.df$tpp - roc.df$fpp),"thresholds"]
+
+```
+```{r, echo=FALSE, message=FALSE}
+#using pROC library
+library(pROC)
+#make a square plot area so that the result graph looks nicer
+par(pty="s")
+#"plot=T" shows the ROC curve, "legacy.axes=T" shows "1 - specificity" on x axis instead of "specificity"
+roc(nhanesExample$obese, model$fitted.values,plot=T, legacy.axes=T)
+
+#create a variable to store ROC information
+roc.info=roc(nhanesExample$obese, model$fitted.values, legacy.axes=T)
+#create data frame store true positive rate, false positive rate and corresponding threshold
+roc.df=data.frame(
+  tpp=roc.info$sensitivities,
+  fpp=(1 - roc.info$specificities),
+  thresholds=roc.info$thresholds
+)
+#show the optimal threshold using Youden index which maximize (sensitivity + specificity -1)
+roc.df[which.max(roc.df$tpp - roc.df$fpp),"thresholds"]
+
+```
+
