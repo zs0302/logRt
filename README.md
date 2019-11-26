@@ -4,6 +4,6 @@ Data is [here](https://raw.githubusercontent.com/zhengyes/logRt/master/rExample.
 
 html page is [here](https://zhengyes.github.io/logRt/)
 
-
+This tutorial introduce logistic regression and ROC curve analysis. 
 
 
