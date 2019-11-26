@@ -403,7 +403,7 @@ nhanesExample$obese = factor(nhanesExample$obese)</code></pre>
 <div id="interpret-the-result" class="section level4">
 <h4>Interpret the result</h4>
 <p>Let us first explain what is odds. Odds is the ratio of the probability of success over the probability of the failure. In this tutorial, the odds of obesity is probability of obesity over probability of not obesity. Why we need to know this? Because in the logistic regression model, the logarithm of the odds for the value labeled “1” (obesity) is a linear combination of all independent variables.</p>
-<p>In the summary result of this model, we can see that all variables are significant with p-values less than 0.05, which means that all parameters are significantly different from 0. The estimation of gender2 equals 0.3877 means that being female (gender2) will increase the log odds of obesity by 0.3877 compared with male (gender1), one year older in age will increase the log odds of obesity by 0.0141, and one unit increase in systolic blood pressure will increase the log odds of obesity by 0.0183. If we take the exponential of the estimation of the parameters, we will see that being female will increase the odds of obesity by 1.5204 compared with male, one year older will increase the odds of obesity by 1.0140 and one unit increase in systolic blood pressure will increase the odds of obesity by 1.0172.</p>
+<p>In the summary result of this model, we can see that all variables are significant with p-values less than 0.05, which means that all parameters are significantly different from 0. The estimation of gender2 equals 0.3877 means that being female (gender2) will increase the log odds of obesity by 0.3877 compared with male (gender1), one year older in age will increase the log odds of obesity by 0.0141, and one unit increase in systolic blood pressure will increase the log odds of obesity by 0.0183. If we take the exponential of the estimation of the parameters, we will see that being female will increase the odds of obesity by 1.4736 compared with male, one year older will increase the odds of obesity by 1.0142 and one unit increase in systolic blood pressure will increase the odds of obesity by 1.0184.</p>
 <pre class="r"><code>summary(model)
 exp(model$coefficients)</code></pre>
 <pre><code>## 
@@ -440,14 +440,14 @@ exp(model$coefficients)</code></pre>
 <h3>ROC analysis</h3>
 <p><br /></p>
 <p>ROC (Receiver Operating Characteristic) curve displays true positive rate versus false positive rate of a fitted model. It can be used for estimating the performance of a model and selecting the optimal cutoff point.</p>
-<p>Before giving you further information about the ROC curve, let us talk about some terminologies. The true positive means the model predicts subject is obese and the subject is obese. The false positive means the model predicts subject is obese but the subject is actually not obese. The true negative means the model predicts subject not obese and the subject is not obese. The false negative means the model predicts the subject is not obese but the subject is actually obese. Sensitivity is the true positive rate which equals to <span class="math inline">\(\frac{truepositive}{true positive + false negative}\)</span>, 1 - specificity is the false positie rate which equals to <span class="math inline">\(\frac{false positive}{false positive + true negative}\)</span>.</p>
+<p>Before giving you further information about the ROC curve, let us talk about some terminologies. The true positive means the model predicts subject is obese and the subject is obese. The false positive means the model predicts subject is obese but the subject is actually not obese. The true negative means the model predicts subject not obese and the subject is not obese. The false negative means the model predicts the subject is not obese but the subject is actually obese. Sensitivity is the true positive rate which equals to <span class="math inline">\(\frac{true positive}{true positive + false negative}\)</span>, 1 - specificity is the false positive rate which equals to <span class="math inline">\(\frac{false positive}{false positive + true negative}\)</span>.</p>
 <p>Why we need this? Because in the ROC curve, the y axis is the sensitivity, which is the true positive rate, and the x axis is 1 - specificity which is the false positive rate. The ROC curve plots out the sensitivity and specificity for every possible cutoff between 0 and 1 for the logistic regression model. The area under the ROC curve is called AUC (area under the curve). The larger the AUC is, the better the model performs.</p>
 <p>An optimal cutoff point can be determined by Youden index. The Youden index J = sensitivity + specificity -1. A value of 1 indicates that there are no false positive or false negative so that the model is perfect. A value of zero indicates that true positive rate equals to false positive rate such that the model predicts results just like random guess. The optimal cutoff point is the one which maximize the Youden index J.</p>
 <p>We need to use the cutpointr package to do the ROC analysis. If you do not have this package on your computer, you need to install it firstly, just type the following code in the RStudio console, and the package will be installed automatically.</p>
 <pre class="r"><code>install.package(&quot;cutpointr&quot;)</code></pre>
 <p>In the ROC plot, the ROC curve is above the diagonal line which implies good classification result. The point on the ROC curve has the corresponding sensitivity and specificity which lead to the optimal Youden’s index cutoff point. In the code, x is the fitted values, and class is the original binary outcomes.</p>
 <pre class="r"><code>library(cutpointr)
-# create a data frame contains all information about the ROC curv analysis
+# create a data frame contains all information about the ROC curve analysis
 # x = logistic regression model predicted values for obesity
 # class = original values for obesity
 cp &lt;- cutpointr(x=model$fitted.values, class=nhanesExample$obese, metric = youden) 
@@ -458,8 +458,8 @@ plot_roc(cp)</code></pre>
 <pre class="r"><code># display the AUC value
 auc(cp)</code></pre>
 <pre><code>## [1] 0.6886081</code></pre>
-<p>The Youden’s index shows that the optimal threshold is <strong>0.2532</strong>. Therefore, for the predicted probability of obesity, values below 0.2532 become 0 (not obese) and values above 0.2532 become 1 (obese). For this threshold, the fitted model has the largest differnce between its true positive rate and false positive rate, which maximize the Youden’s J statistic.</p>
-<pre class="r"><code># show the optimal cutpoint by maximizing Youden&#39;s index
+<p>The Youden’s index shows that the optimal threshold is <strong>0.2532</strong>. Therefore, for the predicted probability of obesity, values below 0.2532 become 0 (not obese) and values above 0.2532 become 1 (obese). For this threshold, the fitted model has the largest difference between its true positive rate and false positive rate, which maximize the Youden’s J statistic.</p>
+<pre class="r"><code># show the optimal cut point by maximizing Youden&#39;s index
 unlist(summary(cp)$confusion_matrix)[1]</code></pre>
 <pre><code>##  cutpoint 
 ## 0.2531718</code></pre>

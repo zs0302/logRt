@@ -93,7 +93,7 @@ exp(model$coefficients)
 ROC (Receiver Operating Characteristic) curve displays true positive rate versus false positive rate of a fitted model. It can be used for estimating the performance of a model and selecting the optimal cutoff point.
 
 Before giving you further information about the ROC curve, let us talk about some terminologies. 
-The true positive means the model predicts subject is obese and the subject is obese. The false positive means the model predicts subject is obese but the subject is actually not obese. The true negative means the model predicts subject not obese and the subject is not obese. The false negative means the model predicts the subject is not obese but the subject is actually obese. Sensitivity is the true positive rate which equals to $\frac{truepositive}{true positive + false negative}$, 1 - specificity is the false positie rate which equals to $\frac{false positive}{false positive + true negative}$.
+The true positive means the model predicts subject is obese and the subject is obese. The false positive means the model predicts subject is obese but the subject is actually not obese. The true negative means the model predicts subject not obese and the subject is not obese. The false negative means the model predicts the subject is not obese but the subject is actually obese. Sensitivity is the true positive rate which equals to $\frac{true positive}{true positive + false negative}$, 1 - specificity is the false positive rate which equals to $\frac{false positive}{false positive + true negative}$.
 
 Why we need this? Because in the ROC curve, the y axis is the sensitivity, which is the true positive rate, and the x axis is 1 - specificity which is the false positive rate. The ROC curve plots out the sensitivity and specificity for every possible cutoff between 0 and 1 for the logistic regression model. The area under the ROC curve is called AUC (area under the curve). The larger the AUC is, the better the model performs.
 
@@ -109,7 +109,7 @@ In the ROC plot, the ROC curve is above the diagonal line which implies good cla
 
 ```{r eval=FALSE}
 library(cutpointr)
-# create a data frame contains all information about the ROC curv analysis
+# create a data frame contains all information about the ROC curve analysis
 # x = logistic regression model predicted values for obesity
 # class = original values for obesity
 cp <- cutpointr(x=model$fitted.values, class=nhanesExample$obese, metric = youden) 
@@ -119,7 +119,7 @@ plot_roc(cp)
 
 ```{r,echo=FALSE, message=FALSE}
 library(cutpointr)
-# create a data frame contains all information about the ROC curv analysis
+# create a data frame contains all information about the ROC curve analysis
 # x = logistic regression model predicted values for obesity
 # class = original values for obesity
 cp <- cutpointr(x=model$fitted.values, class=nhanesExample$obese, metric = youden) 
@@ -139,13 +139,13 @@ auc(cp)
 ```
 
 
-The Youden's index shows that the optimal threshold is **0.2532**. Therefore, for the predicted probability of obesity, values below 0.2532 become 0 (not obese) and values above 0.2532 become 1 (obese). For this threshold, the fitted model has the largest differnce between its true positive rate and false positive rate, which maximize the Youden's J statistic.
+The Youden's index shows that the optimal threshold is **0.2532**. Therefore, for the predicted probability of obesity, values below 0.2532 become 0 (not obese) and values above 0.2532 become 1 (obese). For this threshold, the fitted model has the largest difference between its true positive rate and false positive rate, which maximize the Youden's J statistic.
 ```{r eval=FALSE}
-# show the optimal cutpoint by maximizing Youden's index
+# show the optimal cut point by maximizing Youden's index
 unlist(summary(cp)$confusion_matrix)[1]
 ```
 ```{r echo=FALSE}
-# show the optimal cutpoint by Youden's index
+# show the optimal cut point by Youden's index
 unlist(summary(cp)$confusion_matrix)[1]
 ```
 
