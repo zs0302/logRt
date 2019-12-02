@@ -20,9 +20,9 @@ We will firstly explain the data set which we are going to use, and how to impor
 
 ### Import the data
 
-The data set we are using here is from NHANES (National Health and Nutrition Examination Survey). We will just use the data as an example to show logistic regression, so the complex survey design will not be used. There are 7295 observations in the data set. The dependent variable is the obesity of the subject. Subject whose BMI is over 30 will be denoted with "1" and the subject with a BMI not over 30 will be denoted as "0". The independent variables include age, gender and systolic blood pressure (SBP). We are going to predict subject's obesity using the age, gender and SBP variables with logistic regression model.
+The data set we are using here is from NHANES (National Health and Nutrition Examination Survey). We will just use the data as an example to show logistic regression, so the complex survey design will not be used. There are 7295 observations in the data set. The dependent variable is a two level Body Mass Index (BMI) of the subject. Subject whose BMI is over 30 will be denoted with "1" and the subject with BMI less than 30 will be denoted as "0". The independent variables include age, gender and systolic blood pressure (SBP). We are going to predict subject's BMI using the age, gender and SBP variables in a logistic regression model.
 
-We highly recommend you to use RStudio for the analysis in this tutorial. RStudio is an integrated development environment (IDE) for R. All the code in this tutorial are case sensitive. 
+We highly recommend that you use RStudio for the analysis in this tutorial. RStudio is an integrated development environment (IDE) for R. All the code in this tutorial are case sensitive. 
 
 You can download the data from [Box](https://missouri.box.com/s/s82enrnhdr0nfjr93ym01vns242gu7ow) or [Github](https://raw.githubusercontent.com/zhengyes/logRt/master/rExample.csv). After downloading the data, you need to find the path of the data file on your computer and import the data to R.
 
@@ -32,7 +32,7 @@ Type the following code in the RStudio console, then a "select file" window will
 file.choose()
 ```
 
-Now you have the path of the file, you can use read.csv() function to read the .csv file into R. Type the following code in the RStudio console but replace the path between quotations, with your file path. The new data set will be named "nhanesExample".
+Now you have the path of the file, you can use the read.csv() function to read the .csv file into R. Type the following code in the RStudio console but replace the path between quotations, with your file path. The new data set will be named "nhanesExample".
 ```{r echo=FALSE}
 nhanesExample = read.csv("C:\\Users\\zs7hm\\Desktop\\rExample.csv")
 ```
@@ -47,7 +47,7 @@ nhanesExample = read.csv("C:\\Users\\zs7hm\\Desktop\\rExample.csv")
 <br/>
 
 #### When to use logistic regression
-Logistic regression is a statistical model uses a logistic function to model a **binary dependent variable**. It is used when we want to predict the probability of a binary outcome using independent variables. The binary dependent variable is a categorical variable which has only two possible outcomes. In the data set here, the binary dependent variable is the obesity variable, which has "obesity" denoted as "1" and "not obesity" denoted as "0". 
+Logistic regression is a statistical model which uses a log function to model a binary dependent variable, or a categorical variable with  only two possible outcomes. It is used when we want to predict the probability of a binary outcome using independent variables. The binary dependent variable is a categorical variable which has only two possible outcomes. In the data set here, the binary dependent variable is the obesity variable, which has "obesity" denoted as "1" and "not obesity" denoted as "0". 
 
 #### How to do logistic regression in R
 We need to change the gender variable and obese variable to categorical variables.
