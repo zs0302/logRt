@@ -376,8 +376,8 @@ summary {
 <p><br /></p>
 <div id="data" class="section level3">
 <h3>Data</h3>
-<p>There are 2000 observations in the data set. The dependent variable is the two-level obesity status of the subject. Subjects who are obesity are denoted as “1”, and those who are not obesity are denoted as “0”. The independent variables include age, gender and systolic blood pressure (SBP).</p>
-<p>You can download the data from <a href="https://missouri.box.com/s/0cuco50evri9vadgmhxgemqv8ciktjg0">Box</a> or <a href="https://raw.githubusercontent.com/zhengyes/logRt/master/tutorial.csv">Github</a>.</p>
+<p>There are 2000 observations in the data set. The dependent variable is the two-level obesity status of the subject. Subjects who are obese are denoted as “1”, and those who are not obese are denoted as “0”. The independent variables include age, gender and systolic blood pressure (SBP).</p>
+<p>You can download the data in the format of .csv from <a href="https://missouri.box.com/s/0cuco50evri9vadgmhxgemqv8ciktjg0">Box</a> or <a href="https://raw.githubusercontent.com/zhengyes/logRt/master/tutorial.csv">Github</a>.</p>
 <p><br /></p>
 </div>
 <div id="import-the-data" class="section level3">
@@ -399,12 +399,12 @@ summary {
 </div>
 <div id="how-to-do-logistic-regression-in-r" class="section level4">
 <h4>How to do logistic regression in R</h4>
-<p>Because the original data are numbers, R will regard all data as numerical data. However, for obesity and gender variables, the numbers just represent their variable levels. In order to tell R about this, we need to change these two variables to categorical variables. We can use the factor() function to do this.</p>
+<p>Because the original data are numbers, R will regard all data as numerical data. However, for obesity and gender variables, the numbers just represent their category levels. In order to tell R about this, we need to change these two variables to categorical ones. We can use the factor() function to do this.</p>
 <pre class="r"><code>tutorial$gender = factor(tutorial$gender)
 tutorial$obesity = factor(tutorial$obesity)</code></pre>
-<p>Now we will use the glm (generalized linear regression) function to do the logistic regression.</p>
-<p>We build a model called tutorial.model, the dependent variable on the left side of the tilde (~) is the obesity status, and the independent variables are age, gender and systolic blood pressure (sbp), which are on the right side of the tilde (~), joined by plus sign (+). Note that, gender and obesity are categorical variables. In logistic regression, let p = Probability(subject is obesity), we have, logit(p) = <span class="math inline">\(\beta0\)</span> + <span class="math inline">\(\beta1\)</span> * age + <span class="math inline">\(\beta2\)</span> * gender + <span class="math inline">\(\beta3\)</span> * sbp, the logit function is log odds of obesity which equals to log(). logistic regression model is an example of the generalized linear model (GLM).</p>
-<p>Because we just have 0 and 1 for the outcomes, the distribution of outcome follows a binomial distribution Binomial(n, p) where n is the sample size and p is the probability of being obesity. That is the reason why we have family = “binomial” in the code.</p>
+<p>Now we will use the glm (generalized linear model) function to do the logistic regression. Logistic regression model is an example of the generalized linear model.</p>
+<p>We build a model called tutorial.model, the dependent variable on the left side of the tilde (~) is the obesity status, and the independent variables are age, gender and systolic blood pressure (sbp), which are on the right side of the tilde (~), joined by plus sign (+). In logistic regression, let p = Probability(subject is obese), we have, logit(p) = <span class="math inline">\(\beta0\)</span> + <span class="math inline">\(\beta1\)</span> * age + <span class="math inline">\(\beta2\)</span> * gender + <span class="math inline">\(\beta3\)</span> * sbp, the logit function is log odds of obesity which equals to log().</p>
+<p>Because we just have 0 and 1 for the outcomes, the distribution of outcome follows a binomial distribution Binomial(n, p) where n is the sample size and p is the probability of being obese. That is the reason why we have family = “binomial” in the code.</p>
 <p>“data =tutorial” indicates that we are using the data set “tutorial” for building the model.</p>
 <pre class="r"><code>tutorial.model=glm(obesity ~ age + gender + sbp, 
                    family = &quot;binomial&quot;,
@@ -412,8 +412,13 @@ tutorial$obesity = factor(tutorial$obesity)</code></pre>
 </div>
 <div id="interpret-the-result" class="section level4">
 <h4>Interpret the result</h4>
-<p>Let us first explain what is odds. Odds is the ratio of the probability of success over the probability of the failure. In this tutorial, the odds of obesity equal to probability of being obesity over probability of not being obesity. From the table we can see that, for male the odds of being obesity is 265/690 = 0.3840, for female the odds of being obesity is 381/664 = 0.5738. The odds ratio of obesity, which is the ratio of odds for female to the odds for male equals to (381/664)/(265/690)= 1.4943, which means that the odds for female being obesity have 49.43% higher change than the odds for male of being obesity in this data set before fitting the model.</p>
-<p>In the summary result of this model, we can see that all variables are significant with p-values less than 0.05, which means that all model coefficients are significantly different from 0. The coefficient estimation of gender2 equals 0.4910, which means that being female (gender2) increases the log odds of obesity by 0.4910 compared with male (gender1). The log function and exponential function are inverse functions, so we can use the exponential function to get the odds ratio. For here, exponential of 0.4910 equals to 1.6340, which means that the odds for female being obesity is 63.4% higher than the odds of male being obesity. The coefficient estimation of age is 0.0133, which means that one year older in age will increase the log odds of obesity by 0.0133. Exponential of 0.0133 equals to 1.0134, so one year older leads to 1.34% higher odds for being obesity. The coefficient estimation of sbp is 0.0188, which means that one unit increase in systolic blood pressure leads to 0.0188 increase of log odds of obesity. Exponetial of 0.0188 equals to 1.0190, so one unit increase in SBP leads to 1.9% higher odds for being obesity.</p>
+<p>Let us first explain what is odds. Below is the contingency table for obesity and gender.</p>
+<pre><code>##            gender
+## obesity     Male Female
+##   Not Obese  690    664
+##   Obese      265    381</code></pre>
+<p>Odds is the ratio of the probability of “success” over the probability of “failure”. In this tutorial, the odds of obesity equal to probability of being obese over probability of not being obese. From the table we can see that, for male the odds of being obese is 265/690 = 0.3840, for female the odds of being obese is 381/664 = 0.5738. The odds ratio of obesity, which is the ratio of odds for female to the odds for male equals to (381/664)/(265/690)= 1.4943, which means that the odds for female being obese have 49.43% higher than the odds for male of being obese in this data set before fitting the model.</p>
+<p>In the summary result of this model, we can see that all variables are significant with p-values less than 0.05, which means that all model coefficients are significantly different from 0. The coefficient estimation of gender2 equals 0.4910, which means that being female (gender2) increases the log odds of obesity by 0.4910 compared with male (gender1). The log function and exponential function are inverse functions, so we can use the exponential function to get the odds ratio. For here, exponential of 0.4910 equals to 1.6340, which means that the odds for female being obese is 63.4% higher than the odds for male being obese. The coefficient estimation of age is 0.0133, which means that one year older in age will increase the log odds of obesity by 0.0133. Exponential of 0.0133 equals to 1.0134, which means that one year older leads to 1.34% higher odds for being obese. The coefficient estimation of sbp is 0.0188, which means that one unit increase in systolic blood pressure leads to 0.0188 increase of log odds of obese. Exponetial of 0.0188 equals to 1.0190, so one unit increase in SBP leads to 1.9% higher odds for being obese.</p>
 <pre class="r"><code>summary(tutorial.model)
 exp(tutorial.model$coefficients)</code></pre>
 <pre><code>## 
