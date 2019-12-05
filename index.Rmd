@@ -1,7 +1,7 @@
 ---
 title: "Logistic regression tutorial using R"
 author: "Leary Ortho Biostats Lab"
-date: "11/26/2019"
+date: "12/03/2019"
 output: html_document
 ---
 
@@ -18,13 +18,19 @@ We will firstly explain the data set which we are going to use, and how to impor
 
 <br/>
 
-### Import the data
+### Data
 
-The data set we are using here is from NHANES (National Health and Nutrition Examination Survey). We will just use the data as an example to show logistic regression, so the complex survey design will not be used. There are 7295 observations in the data set. The dependent variable is a two level Body Mass Index (BMI) of the subject. Subject whose BMI is over 30 will be denoted with "1" and the subject with BMI less than 30 will be denoted as "0". The independent variables include age, gender and systolic blood pressure (SBP). We are going to predict subject's BMI using the age, gender and SBP variables in a logistic regression model.
+There are 2000 observations in the data set. The dependent variable is the two-level obesity status of the subject. Subjects who are obesity are denoted as "1", and those who are not obesity are denoted as "0". The independent variables include age, gender and systolic blood pressure (SBP).
+
+You can download the data from [Box](https://missouri.box.com/s/s82enrnhdr0nfjr93ym01vns242gu7ow) or [Github](https://raw.githubusercontent.com/zhengyes/logRt/master/rExample.csv).
+
+<br/>
+
+### Import the data
 
 We highly recommend that you use RStudio for the analysis in this tutorial. RStudio is an integrated development environment (IDE) for R. All the code in this tutorial are case sensitive. 
 
-You can download the data from [Box](https://missouri.box.com/s/s82enrnhdr0nfjr93ym01vns242gu7ow) or [Github](https://raw.githubusercontent.com/zhengyes/logRt/master/rExample.csv). After downloading the data, you need to find the path of the data file on your computer and import the data to R.
+After downloading the data, you need to find the path of the data file on your computer and import the data to R.
 
 Type the following code in the RStudio console, then a "select file" window will pop up. Use the pop-up window to navigate to the file you want to import and click "Open", the path will display in the console window.
 
@@ -32,12 +38,12 @@ Type the following code in the RStudio console, then a "select file" window will
 file.choose()
 ```
 
-Now you have the path of the file, you can use the read.csv() function to read the .csv file into R. Type the following code in the RStudio console but replace the path between quotations, with your file path. The new data set will be named "nhanesExample".
+Now you have the path of the file, you can use the read.csv() function to read the .csv file into R. Type the following code in the RStudio console but replace the path between quotations, with your file path. The new data set will be named "tutorial".
 ```{r echo=FALSE}
-nhanesExample = read.csv("C:\\Users\\zs7hm\\Desktop\\rExample.csv")
+tutorial = read.csv("C:\\Users\\zs7hm\\Desktop\\tutorial.csv")
 ```
 ```{r eval=FALSE}
-nhanesExample = read.csv("C:\\Users\\zs7hm\\Desktop\\rExample.csv")
+tutorial = read.csv("C:\\Users\\zs7hm\\Desktop\\tutorial.csv")
 ```
 
 <br/>
@@ -47,41 +53,53 @@ nhanesExample = read.csv("C:\\Users\\zs7hm\\Desktop\\rExample.csv")
 <br/>
 
 #### When to use logistic regression
-Logistic regression is a statistical model which uses a log function to model a binary dependent variable, or a categorical variable with  only two possible outcomes. It is used when we want to predict the probability of a binary outcome using independent variables. The binary dependent variable is a categorical variable which has only two possible outcomes. In the data set here, the binary dependent variable is the obesity variable, which has "obesity" denoted as "1" and "not obesity" denoted as "0". 
+Logistic regression is a statistical model which uses a log function to model a binary dependent variable, or a categorical variable with only two possible outcomes. It is used when we want to predict the the binary outcome variable from predictor variables that are continuous and/or categorical. In the data set here, the binary dependent variable is the obesity status, which has "1" means subject is obese and "0" means subject is not obese.
 
 #### How to do logistic regression in R
-We need to change the gender variable and obese variable to categorical variables.
+Because the original data are numbers, R will regard all data as numerical data. However, for obesity and gender variables, the numbers just represent their variable levels. In order to tell R about this,  we need to change these two variables to categorical variables. We can use the factor() function to do this.
 
 ```{r echo=FALSE}
-nhanesExample$gender = factor(nhanesExample$gender)
-nhanesExample$obese = factor(nhanesExample$obese)
+tutorial$gender = factor(tutorial$gender)
+tutorial$obesity = factor(tutorial$obesity)
 ```
 ```{r eval=FALSE}
-nhanesExample$gender = factor(nhanesExample$gender)
-nhanesExample$obese = factor(nhanesExample$obese)
+tutorial$gender = factor(tutorial$gender)
+tutorial$obesity = factor(tutorial$obesity)
 ```
 
-Now we will use the glm (generalized linear regression) function to do the logistic regression. Logistic regression is just one type of the generalized linear regression, so in the code we use family = "binomial" to indicate that we are using logistic regression. 
+Now we will use the glm (generalized linear regression) function to do the logistic regression. 
+
+We build a model called tutorial.model, the dependent variable on the left side of the tilde (~) is the obesity status, and the independent variables are age, gender and systolic blood pressure (sbp), which are on the right side of the tilde (~), joined by plus sign (+). Note that, gender and obesity are categorical variables. In logistic regression, let p = Probability(subject is obesity), we have, logit(p) = $\beta0$ + $\beta1$ * age + $\beta2$ * gender + $\beta3$ * sbp, the logit function is log odds of obesity which equals to log(\frac{p}{1-p}). logistic regression model is an example of the generalized linear model (GLM).  
+
+Because we just have 0 and 1 for the outcomes, the distritbution of outcome follows a binomial distribution Binomial(n, p) where n is the sample size and p is the probability of being obesity. That is the reason why we have family = "binomial" in the code.
+
+"data =tutorial" indicates that we are using the data set "tutorial" for building the model.
+
 
 ```{r eval=FALSE}
-model=glm(obese~ age + gender + sbp, family = "binomial",data=nhanesExample)
+tutorial.model=glm(obesity ~ age + gender + sbp, 
+                   family = "binomial",
+                   data=tutorial)
 ```
 ```{r echo=FALSE}
-model=glm(obese~ age + gender + sbp, family = "binomial",data=nhanesExample)
+tutorial.model=glm(obesity ~ age + gender + sbp, 
+                   family = "binomial",
+                   data=tutorial)
 ```
 
 #### Interpret the result
-Let us first explain what is odds. Odds is the ratio of the probability of success over the probability of the failure. In this tutorial, the odds of obesity is probability of obesity over probability of not obesity. Why we need to know this? Because in the logistic regression model, the logarithm of the odds for the value labeled "1" (obesity) is a linear combination of all independent variables.
+Let us first explain what is odds. Odds is the ratio of the probability of success over the probability of the failure. In this tutorial, the odds of obesity equals to probability of being obesity over probability of not being obesity. From the table we can see that, for male the odds of being obesity is 265/690 = 0.3840, for female the odds of being obesity is 381/664 = 0.5738. The odds ratio of obesity, whihc is the ratio of odds for female to the odds for male equals to (381/664)/(265/690)= 1.4943, which means that the odds for female being obesity have 49.43% higher change than the odds for male of being obesity in theis data set before fitting the model.
 
-In the summary result of this model, we can see that all variables are significant with p-values less than 0.05, which means that all parameters are significantly different from 0. The estimation of gender2 equals 0.3877 means that being female (gender2) will increase the log odds of obesity by 0.3877 compared with male (gender1), one year older in age will increase the log odds of obesity by 0.0141, and one unit increase in systolic blood pressure will increase the log odds of obesity by 0.0183. If we take the exponential of the estimation of the parameters, we will see that being female will increase the odds of obesity by 1.4736 compared with male, one year older will increase the odds of obesity by 1.0142 and one unit increase in systolic blood pressure will increase the odds of obesity by 1.0184.
+In the summary result of this model, we can see that all variables are significant with p-values less than 0.05, which means that all model coefficients are significantly different from 0. The coefficient estimation of gender2 equals 0.4910, which means that being female (gender2) increases the log odds of obesity by 0.4910 compared with male (gender1). The log function and exponential function are inverse functions, so we can use the exponential function to get the odds ratio. For here, exp(0.4910) = 1.6340, which means that the odds for female being obesity is 63.4% higher than the odds  of male being obesity. The coefficient estimation of age is 0.0133, which means that one year older in age will increase the log odds of obesity by 0.0133. Exponetial of 0.0133 equals to 1.0134, so one year older leads to 1.34% higher odds for being obesity. The coefficient estimation of sbp is 0.0188, which means that one unit increase in systolic blood pressure leads to 0.0188 increase of log odds of obesity. Exponetial of 0.0188 equals to 1.0190, so one unit increase in SBP leads to 1.9% higher odds for being obesity.
+
 
 ```{r eval=FALSE}
-summary(model)
-exp(model$coefficients)
+summary(tutorial.model)
+exp(tutorial.model$coefficients)
 ```
 ```{r echo=FALSE}
-summary(model)
-exp(model$coefficients)
+summary(tutorial.model)
+exp(tutorial.model$coefficients)
 ```
 
 <br/>
@@ -92,12 +110,23 @@ exp(model$coefficients)
 
 ROC (Receiver Operating Characteristic) curve displays true positive rate versus false positive rate of a fitted model. It can be used for estimating the performance of a model and selecting the optimal cutoff point.
 
-Before giving you further information about the ROC curve, let us talk about some terminologies. 
-The true positive means the model predicts subject is obese and the subject is obese. The false positive means the model predicts subject is obese but the subject is actually not obese. The true negative means the model predicts subject not obese and the subject is not obese. The false negative means the model predicts the subject is not obese but the subject is actually obese. Sensitivity is the true positive rate which equals to $\frac{true positive}{true positive + false negative}$, 1 - specificity is the false positive rate which equals to $\frac{false positive}{false positive + true negative}$.
+Before giving you further information about the ROC curve, let us review some vocabulary.
 
-Why we need this? Because in the ROC curve, the y axis is the sensitivity, which is the true positive rate, and the x axis is 1 - specificity which is the false positive rate. The ROC curve plots out the sensitivity and specificity for every possible cutoff between 0 and 1 for the logistic regression model. The area under the ROC curve is called AUC (area under the curve). The larger the AUC is, the better the model performs.
+* A true positive means that the model predicts that a subject is obese and the subject is actually obese. 
 
-An optimal cutoff point can be determined by Youden index. The Youden index J = sensitivity + specificity -1. A value of 1 indicates that there are no false positive or false negative so that the model is perfect. A value of zero indicates that true positive rate equals to false positive rate such that the model predicts results just like random guess. The optimal cutoff point is the one which maximize the Youden index J.
+* A false positive means that the model predicts that a subject is obese but the subject is not obese. 
+
+* A true negative means that the model predicts that the subject is not obese and the subject is not obese. 
+
+* A false negative means that the model predicts that the subject is not obese but the subject is actually obese.
+
+* $Sensitivity = \frac{true\  positive}{true\ positive + false\ negative}$, also called true positive rate (TPR).
+  
+* $1 - specificity = \frac{false\ positive}{false\ positive + true\ negative}$, also called false positive rate (FPR).
+
+In the ROC curve, the y axis denotes the **sensitivity**, which is the true positive rate, and the x axis denotes **1 - specificity** which is the false positive rate. The ROC curve plots out the sensitivity and specificity for every possible cutoff between 0 and 1 for the logistic regression model. The area under the ROC curve is called AUC (area under the curve). The larger the AUC is, the better the model performs.
+
+An optimal cutoff point can be determined by Youden index. The Youden index $$J = sensitivity + specificity -1$$. A value of 1 indicates that there are no false positives or false negatives so that the model is perfect. A value of zero indicates that true positive rate equals to false positive rate such that the model predicts results no better than by chance. The optimal cutoff point is the one which maximize the Youden index J. Since the coefficients of sensitivity and specificity are both 1, they contribute equally for maximizing the Youden's index, which means that Youden's index is used when we think sensitivity and specificity are equally important.
 
 We need to use the cutpointr package to do the ROC analysis. If you do not have this package on your computer, you need to install it firstly, just type the following code in the RStudio console, and the package will be installed automatically.
 
@@ -105,14 +134,16 @@ We need to use the cutpointr package to do the ROC analysis. If you do not have 
 install.package("cutpointr")
 ```
 
-In the ROC plot, the ROC curve is above the diagonal line which implies good classification result. The point on the ROC curve has the corresponding sensitivity and specificity which lead to the optimal Youden's index cutoff point. In the code, x is the fitted values, and class is the original binary outcomes.
+The ROC curve is usually a concave curve that towards the upper left corner. The closer the curve is to the corner, the better classification result the model will have. If the curve is a straight line, it means the model has a random calssifier and predicts result no better than by chance. The point denoted in the ROC curve figure below corresponds to the optimal Youden's index value. Note, we use the Youden's index when we think sensitivity and specificity are equally important. In the code, x denotes the fitted values and "class" denoteds the original dependent binary outcome, obesity.
 
 ```{r eval=FALSE}
 library(cutpointr)
 # create a data frame contains all information about the ROC curve analysis
 # x = logistic regression model predicted values for obesity
 # class = original values for obesity
-cp <- cutpointr(x=model$fitted.values, class=nhanesExample$obese, metric = youden) 
+cp <- cutpointr(x=tutorial.model$fitted.values, 
+                class=tutorial$obesity, 
+                metric = youden) 
 # plot the ROC curve
 plot_roc(cp)
 ```
@@ -122,13 +153,15 @@ library(cutpointr)
 # create a data frame contains all information about the ROC curve analysis
 # x = logistic regression model predicted values for obesity
 # class = original values for obesity
-cp <- cutpointr(x=model$fitted.values, class=nhanesExample$obese, metric = youden) 
+cp <- cutpointr(x=tutorial.model$fitted.values, 
+                class=tutorial$obesity, 
+                metric = youden) 
 # plot the ROC curve
 plot_roc(cp)
 ```
 
+The AUC = **0.6884** and it can be used for model comparisons. AUC is the area enclosed by the ROC curve, it has a range between 0.5 and 1. Note, we get AUC = 0.5 when the ROC curve is the straight diagonal line. The higher the AUC value, the better the model is at predicting the obesity.
 
-The AUC = **0.6886**, it can be used as a standard to compare performances of different models. The higher the AUC value, the better the model is at predicting not obese as not obese and obese as obese.
 ```{r eval=FALSE}
 # display the AUC value
 auc(cp)
@@ -139,14 +172,14 @@ auc(cp)
 ```
 
 
-The Youden's index shows that the optimal threshold is **0.2532**. Therefore, for the predicted probability of obesity, values below 0.2532 become 0 (not obese) and values above 0.2532 become 1 (obese). For this threshold, the fitted model has the largest difference between its true positive rate and false positive rate, which maximize the Youden's J statistic.
+The Youden's index shows that the optimal threshold is **0.3164**. 
 ```{r eval=FALSE}
 # show the optimal cut point by maximizing Youden's index
-unlist(summary(cp)$confusion_matrix)[1]
+(summary(cp))[[1]][[1]][1,4]
 ```
 ```{r echo=FALSE}
 # show the optimal cut point by Youden's index
-unlist(summary(cp)$confusion_matrix)[1]
+(summary(cp))[[1]][[1]][1,4]
 ```
 
 <br/>
