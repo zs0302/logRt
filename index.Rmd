@@ -1,7 +1,7 @@
 ---
 title: "Logistic regression tutorial using R"
 author: "Leary Ortho Biostats Lab"
-date: "12/03/2019"
+date: "12/09/2019"
 output: html_document
 ---
 
@@ -53,7 +53,7 @@ tutorial = read.csv("C:\\Users\\zs7hm\\Desktop\\tutorial.csv")
 <br/>
 
 #### When to use logistic regression
-Logistic regression is a statistical model which uses a log function to model a binary dependent variable, or a categorical variable with only two possible outcomes. It is used when we want to predict the the binary outcome variable from predictor variables that are continuous and/or categorical. In the data set here, the binary dependent variable is the obesity status, which has "1" means subject is obese and "0" means subject is not obese.
+Logistic regression is a statistical model which uses a log function to model a binary dependent variable, or a categorical variable with only two possible outcomes. It is used when we want to predict the binary outcome variable from predictor variables that are continuous and/or categorical. In the data set here, the binary dependent variable is the obesity status, which has "1" means subject is obese and "0" means subject is not obese.
 
 #### How to do logistic regression in R
 Because the original data are numbers, R will regard all data as numerical data. However, for obesity and gender variables, the numbers just represent their category levels. In order to tell R about this, we need to change these two variables to categorical ones. We can use the factor() function to do this.
@@ -69,9 +69,9 @@ tutorial$obesity = factor(tutorial$obesity)
 
 Now we will use the glm (generalized linear model) function to do the logistic regression. Logistic regression model is an example of the generalized linear model.
 
-We build a model called tutorial.model, the dependent variable on the left side of the tilde (~) is the obesity status, and the independent variables are age, gender and systolic blood pressure (sbp), which are on the right side of the tilde (~), joined by plus sign (+). In logistic regression, let p = Probability(subject is obese), we have, logit(p) = $\beta0$ + $\beta1$ * age + $\beta2$ * gender + $\beta3$ * sbp, the logit function is log odds of obesity which equals to log(\frac{p}{1-p}). 
+In the following code, we build a model called tutorial.model, the dependent variable on the left side of the tilde (~) is the obesity status, and the independent variables are age, gender and systolic blood pressure (sbp), which are on the right side of the tilde (~), joined by plus sign (+). In logistic regression, let p = probability that a subject is obese, we have, $logit(p) = \beta_0 + \beta_1\times age + \beta_2\times gender + \beta_3\times sbp$, the logit function is log odds of obesity which equals to $log(\frac{p}{1-p})$. 
 
-Because we just have 0 and 1 for the outcomes, the distribution of outcome follows a binomial distribution Binomial(n, p) where n is the sample size and p is the probability of being obese. That is the reason why we have family = "binomial" in the code.
+Because we just have 0 and 1 for the outcomes, the distribution of outcome follows a binomial distribution Binomial(n, p), where n is the sample size and p is the probability of being obese. That is the reason why we have family = "binomial" in the code.
 
 "data =tutorial" indicates that we are using the data set "tutorial" for building the model.
 
@@ -88,31 +88,59 @@ tutorial.model=glm(obesity ~ age + gender + sbp,
 ```
 
 #### Interpret the result
-Let us first explain what is odds. Below is the contingency table for obesity and gender.
 
-```{r echo=FALSE}
-tt=tutorial[,c(1,2)]
-levels(tt$gender)=c("Male","Female")
-levels(tt$obesity)=c("Not Obese","Obese")
-table(tt)
-```
-
-Odds is the ratio of the probability of "success" over the probability of "failure". In this tutorial, the odds of obesity equal to probability of being obese over probability of not being obese. From the table we can see that, for male the odds of being obese is 265/690 = 0.3840, for female the odds of being obese is 381/664 = 0.5738. The odds ratio of obesity, which is the ratio of odds for female to the odds for male equals to (381/664)/(265/690)= 1.4943, which means that the odds for female being obese have 49.43% higher than the odds for male of being obese in this data set before fitting the model.
-
-
-In the summary result of this model, we can see that all variables are significant with p-values less than 0.05, which means that all model coefficients are significantly different from 0. The coefficient estimation of gender2 equals 0.4910, which means that being female (gender2) increases the log odds of obesity by 0.4910 compared with male (gender1). The log function and exponential function are inverse functions, so we can use the exponential function to get the odds ratio. For here, exponential of 0.4910 equals to 1.6340, which means that the odds for female being obese is 63.4% higher than the odds for male being obese. The coefficient estimation of age is 0.0133, which means that one year older in age will increase the log odds of obesity by 0.0133. Exponential of 0.0133 equals to 1.0134, which means that one year older leads to 1.34% higher odds for being obese. The coefficient estimation of sbp is 0.0188, which means that one unit increase in systolic blood pressure leads to 0.0188 increase of log odds of obese. Exponetial of 0.0188 equals to 1.0190, so one unit increase in SBP leads to 1.9% higher odds for being obese.
-
+The model we built is called "titorial.model", it contains all the information for the model. If we want to see the details, we need to run the summary() function to get the results.
 
 ```{r eval=FALSE}
+# show model details
 summary(tutorial.model)
-exp(tutorial.model$coefficients)
 ```
 ```{r echo=FALSE}
+# show model details
 summary(tutorial.model)
-exp(tutorial.model$coefficients)
 ```
 
-<br/>
+Let's see what this result tells us.
+
+**Call:** 
+
+This section tells us how the model is built.
+
+**Deviance Residuals:**
+
+Deviance is a measure of goodness of fit of a generalized linear model. The higher deviance indicates worse model fit. Deviance residual is the measure of deviance contributed from each of the observation. This section tells us the minimum, first quartile, median, third quartile and maximum of the deviance residuals.
+
+**Coefficients:**
+
+---
+
+Note:
+
+For better understanding the result, we need to know what are odds and odds ratio. Odds of an event is defined as the likelihood that an event will occur divided by the likelihood that the event will not occur. Odds ratio is a measure of the variable and the outcome. Odds ratio represents the odds that an outcome will occur given a particular exposure, compared to the odds of the outcome occurring in the absence of that exposure. 
+
+---
+
+The coefficient section shows the estimates of logistic regression coefficients. The "Estimate" column shows the estimations of intercept and coefficients for each variable. The "Std.Error" column shows the standard error of the coefficients. The "z value" column shows the Z statistic, which equals to the value of "Estimate" column divided by the value of "Std.Error" column. The Pr(>|z|) column shows the p-value corresponding to Z statistic, it shows the significance of the estimate. We say a variable is significant when its p-value is less than the significance level (usually 0.05).
+
+With these coefficients, the logistic regression model can be written as $ p = \frac{e^{(-3.8658 + 0.0133\times age + 0.4909\times gender + 0.0188\times sbp)}}{1 + e^{(-3.8658 + 0.0133\times age + 0.4909\times gender + 0.0188\times sbp)}}$ (for categorical gender variable, male = 0, female = 1). If we know the age, gender and sbp for a subject, we can predict the probability of being obese by plugging these variable values into the formula.
+
+we can see from the result that all variables are significant with p-values less than 0.05, which means that all model coefficients are significantly different from 0. The coefficient estimation of the categorical variable gender2 equals 0.4910, which means that being female (gender2) increases the log odds of obesity by 0.4910 compared with male (gender1).
+
+The log function and exponential function are inverse functions, so we can use the exponential function to get the odds ratio. Below are the odds ratio and their 95% confidence intervals.
+```{r eval=FALSE}
+exp(cbind("Odds ratio" = coef(tutorial.model), confint.default(tutorial.model, level = 0.95)))
+```
+```{r echo=FALSE}
+exp(cbind("Odds ratio" = coef(tutorial.model), confint.default(tutorial.model, level = 0.95)))
+```
+
+For here, the 95% confidence intervals are all above 1, so different values or levels of the variable will have different associations with outcome variable obesity. The exponential of 0.4910 equals to 1.6340, which means that the odds for female being obese is 63.4% higher than the odds for male being obese. The coefficient estimation of the numerical variable age is 0.0133, which means that one year older in age will increase the log odds of obesity by 0.0133. Exponential of 0.0133 equals to 1.0134, which means that one year older leads to 1.34% higher odds for being obese.
+
+**Null deviance, residual deviance and AIC:**
+
+The null deviance shows how well the outcome variable is predicted by a model that includes only the intercept. The residual deviance shows how well the outcome variable is predicted by the model with all variables included. We can see there are 1999 degree of freedom for the null deviance and 1996 degree of freedom for the residual deviance. This is because 3 degree of freedom are being used for estimating three variables age, gender and sbp. 
+
+AIC (Akaike Information Criterion) is a measure of goodness of fit of the model. We can use it with another model for model performance. Lower AIC value indicates better model fit.
 
 ### ROC analysis
 
@@ -122,13 +150,17 @@ ROC (Receiver Operating Characteristic) curve displays true positive rate versus
 
 Before giving you further information about the ROC curve, let us review some vocabulary.
 
-* A true positive means that the model predicts that a subject is obese and the subject is actually obese. 
-
-* A false positive means that the model predicts that a subject is obese but the subject is not obese. 
-
-* A true negative means that the model predicts that the subject is not obese and the subject is not obese. 
-
-* A false negative means that the model predicts that the subject is not obese but the subject is actually obese.
+```{r echo=FALSE, results='asis'}
+library(knitr)
+d=data.frame(
+c("True Positive",
+"False Positive"),
+c("False Negative",
+"True Negative"))
+row.names(d)=c("Actually Obese","Actually NOT Obese")
+colnames(d)=c("Obese Predicted","NOT Obese predicted")
+kable(d)
+```
 
 * $Sensitivity = \frac{true\  positive}{true\ positive + false\ negative}$, also called true positive rate (TPR).
   
@@ -136,7 +168,7 @@ Before giving you further information about the ROC curve, let us review some vo
 
 In the ROC curve, the y axis denotes the **sensitivity**, which is the true positive rate, and the x axis denotes **1 - specificity** which is the false positive rate. The ROC curve plots out the sensitivity and specificity for every possible cutoff between 0 and 1 for the logistic regression model. The area under the ROC curve is called AUC (area under the curve). The larger the AUC is, the better the model performs.
 
-An optimal cutoff point can be determined by Youden index. The Youden index $$J = sensitivity + specificity -1$$. A value of 1 indicates that there are no false positives or false negatives so that the model is perfect. A value of zero indicates that true positive rate equals to false positive rate such that the model predicts results no better than by chance. The optimal cutoff point is the one which maximize the Youden index J. Since the coefficients of sensitivity and specificity are both 1, they contribute equally for maximizing the Youden's index, which means that Youden's index is used when we think sensitivity and specificity are equally important.
+An optimal cutoff point can be determined by Youden index. The Youden index $$J = sensitivity + specificity -1$$. A value of 1 indicates that there are no false positives or false negatives so that the model is perfect. A value of 0 indicates that true positive rate equals to false positive rate such that the model predicts results no better than by chance. The optimal cutoff point is the one which maximize the Youden index J. Since the coefficients of sensitivity and specificity are both 1, they contribute equally for maximizing the Youden's index, which means that Youden's index is used when we think sensitivity and specificity are equally important.
 
 We need to use the "cutpointr" package to do the ROC analysis. If you do not have this package on your computer, you need to install it firstly, just type the following code in the RStudio console, and the package will be installed automatically.
 
